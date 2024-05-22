@@ -14,10 +14,7 @@ public class VeiculoApiApplication implements CommandLineRunner {
 	}
 
 	public void run(String... args) throws IOException, InterruptedException {
-//		ConversaoDado conversaoDado = new ConversaoDado();
-//		String json = conversaoDado.obterDadosCarro("https://parallelum.com.br/fipe/api/v1/carros/marcas");
-//		System.out.println(json);
-		//System.out.println(conversaoDado.obterDadosCarro("https://parallelum.com.br/fipe/api/v1/carros/marcas"));
+
 		Principal principal = new Principal();
 		principal.exibeMenu();
 
