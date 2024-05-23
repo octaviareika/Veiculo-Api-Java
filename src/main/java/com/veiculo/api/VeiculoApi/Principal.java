@@ -13,6 +13,8 @@ import java.util.Scanner;
 //import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.veiculo.api.VeiculoApi.TipoVeiculo.TipoVeiculo;
+import com.veiculo.api.VeiculoApi.repository.RepositorioVeiculo;
+
 import org.springframework.boot.Banner;
 
 
@@ -21,9 +23,13 @@ public class Principal {
     public Modelo modelos;
     public  converteDadosMapper conversao = new converteDadosMapper();
     public List<TipoVeiculo> veiculosGuardados = new ArrayList<>();
-    public Principal() {
-        this.modelos = new Modelo(new ArrayList<>());
+    public List<TipoVeiculo> veiculosGuardadosNoBanco = new ArrayList<>();
 
+    private RepositorioVeiculo  repositorioVeiculo;
+    public Principal(RepositorioVeiculo repositorioVeiculo) {
+        this.modelos = new Modelo(new ArrayList<>());
+        this.repositorioVeiculo = repositorioVeiculo;
+        
         
     }
 
@@ -42,6 +48,7 @@ public class Principal {
             //System.out.println("Moto");
             System.out.println("-> Caminhoes");
             System.out.println("-> Mostrar veiculos armazenados");
+            System.out.println("-> Procurar veículos armazaneados por meio da marca (Digite 4)");
             System.out.println("-> Sair");
             opcao = scanner.nextLine();
 
@@ -60,6 +67,8 @@ public class Principal {
 
 
                 if (marcaEncontrada.isPresent()) {
+                    
+
                     obj = dado.obterDadosMarca(opcao.toLowerCase(), marcaEncontrada.get().getCodigo());
                     Modelo modelos = conversao.converteDeJsonParaClasse(obj, Modelo.class);
                     System.out.println(modelos);
@@ -88,7 +97,10 @@ public class Principal {
                            System.out.println("Deseja armazenar esse veiculo? (s/n)");
                             var armazenar = scanner.nextLine();
                             if (armazenar.equalsIgnoreCase("s")){
-                                armazenaVeiculo(veiculoFinal);
+                               
+                                salvarVeiculoNoBanco(veiculoFinal);
+                                System.out.println("Veiculo armazenado com sucesso!");
+
                             }
                             else {
                                 System.out.println("Veiculo nao armazenado");
@@ -106,13 +118,15 @@ public class Principal {
             else if (opcao.toLowerCase().equals("carros")){
                 // algo aqui - feito
                 obj = dado.obterDadosCarro("https://parallelum.com.br/fipe/api/v1/carros/marcas");
-               // System.out.println(obj);
+               
                 List<Marca> marcaCarro = conversao.converteDeJsonParaObjeto(obj, new TypeReference<List<Marca>>(){});
                 
                 System.out.println("Digite o codigo da marca do carro");
                 String codigo = scanner.nextLine();
                 obj = dado.obterDadosMarca(opcao.toLowerCase(), codigo);
-
+                // salvar o nome da marca no banco
+              
+                
                 Modelo modelos = conversao.converteDeJsonParaClasse(obj, Modelo.class);
                 System.out.println(modelos);
 
@@ -123,9 +137,9 @@ public class Principal {
                 .filter(m -> m.getModelo().equalsIgnoreCase(nome)).findFirst();
 
                 if (modelo.isPresent()){
-                    //System.out.println(modelo.get().getCodigo());
+                    
                     obj = dado.obterDadosModelo(opcao.toLowerCase(), codigo, modelo.get().getCodigo());
-                    //System.out.println(obj);
+                    
                     List<AnoCarro> anoCarro = conversao.converteDeJsonParaObjeto(obj, new TypeReference<List<AnoCarro>>(){});
                     System.out.println(anoCarro);
                     System.out.println("Digite o nome do ano do Modelo");
@@ -135,14 +149,15 @@ public class Principal {
                             .filter(a -> a.getNome().equalsIgnoreCase(ano)).findFirst();
                     if (anoEncontrado.isPresent()){
                         obj = dado.obterDadosFinal(opcao.toLowerCase(), codigo, anoEncontrado.get().getCodigo(), modelo.get().getCodigo());
-                        //System.out.println(obj);
+                        
                         TipoVeiculo dadoFinal = conversao.converteDeJsonParaClasse(obj, TipoVeiculo.class);
                         System.out.println(dadoFinal);
                         System.out.println("Deseja armazenar esse veiculo? (s/n)");
                         String armazenar = scanner.nextLine();
                         if (armazenar.equalsIgnoreCase("s")){
-                            armazenaVeiculo(dadoFinal);
                             System.out.println("Armazenando...");
+                            salvarVeiculoNoBanco(dadoFinal);
+                            System.out.println("Veiculo armazenado com sucesso!");
                         }
                         else {
                             System.out.println("Finalizando");
@@ -165,7 +180,7 @@ public class Principal {
             }
 
             else if (opcao.toLowerCase().equals("mostrar veiculos armazenados")){
-                mostrarVeiculosArmazenados();
+                mostrarVeiculosSalvosNoBanco();
             }
 
             else if (opcao.toLowerCase().equals("sair")){
@@ -191,12 +206,21 @@ public class Principal {
     }
 
     public void armazenaVeiculo(TipoVeiculo veiculo) {
-        veiculosGuardados.add(veiculo);
+         veiculosGuardados.add(veiculo);
         
     }
 
-    public void mostrarVeiculosArmazenados(){
-        veiculosGuardados.forEach(v -> System.out.println(v.toString() + "\n"));
+    public void mostrarVeiculosSalvosNoBanco(){
+        veiculosGuardadosNoBanco = repositorioVeiculo.findAll();
+        veiculosGuardadosNoBanco.stream()
+            .sorted((v1, v2) -> v1.getMarca().compareTo(v2.getMarca()))
+            .forEach(System.out::println);
+        
+    }
+
+    public void salvarVeiculoNoBanco(TipoVeiculo veiculo){
+
+        repositorioVeiculo.save(veiculo);
     }
 
 }

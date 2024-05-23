@@ -7,6 +7,13 @@ import com.veiculo.api.VeiculoApi.Marca;
 //import com.veiculo.api.VeiculoApi.MarcaCarro;
 import com.veiculo.api.VeiculoApi.ModeloCarro;
 
+import jakarta.annotation.Generated;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 /*TipoVeiculo	1
 Valor	"R$ 104.933,00"
 Marca	"VW - VolksWagen"
@@ -17,7 +24,13 @@ CodigoFipe	"005340-6"
 MesReferencia	"maio de 2024"
 SiglaCombustivel	"D"*/
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
+@Table(name = "tipo_veiculo")
 public class TipoVeiculo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @JsonAlias("TipoVeiculo")
     private int idTipoVeiculo;
     @JsonAlias("Valor")
@@ -51,6 +64,14 @@ public class TipoVeiculo {
         this.codigoFipe = codigoFipe;
         this.mesReferencia = mesReferencia;
         this.siglaComb = siglaComb;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public int getIdTipoVeiculo() {

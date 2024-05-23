@@ -1,7 +1,6 @@
 package com.veiculo.api.VeiculoApi;
 
 import netscape.javascript.JSObject;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -22,7 +21,7 @@ public class ConversaoDado {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         String json = response.body();
-        System.out.println(json);
+       // System.out.println(json);
 
         return json;
     }
