@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.veiculo.api.VeiculoApi.repository.RepositorioVeiculo;
+import com.veiculo.api.VeiculoApi.repository.RepositoryMarca;
 
 import java.io.IOException;
 
@@ -14,6 +15,8 @@ public class VeiculoApiApplication implements CommandLineRunner {
 
 	@Autowired
 	RepositorioVeiculo repositorioVeiculo;
+	@Autowired
+	RepositoryMarca repositorioMarca;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(VeiculoApiApplication.class, args);
@@ -21,7 +24,7 @@ public class VeiculoApiApplication implements CommandLineRunner {
 
 	public void run(String... args) throws IOException, InterruptedException {
 
-		Principal principal = new Principal(repositorioVeiculo);
+		Principal principal = new Principal(repositorioVeiculo, repositorioMarca);
 		principal.exibeMenu();
 
 	}

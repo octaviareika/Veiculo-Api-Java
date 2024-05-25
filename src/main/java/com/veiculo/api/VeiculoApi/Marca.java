@@ -33,7 +33,7 @@ public class Marca {
     private String codigo;
 
     // Uma marca de veículos tem vários modelos
-    @OneToMany(mappedBy = "marca")
+    @OneToMany(mappedBy = "marca") // mapeamento bidirecional, seria tipo um join
     private List<ModeloCarro> modelos;
 
     public Marca() {

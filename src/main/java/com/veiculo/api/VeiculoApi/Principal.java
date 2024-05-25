@@ -14,7 +14,9 @@ import java.util.Scanner;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.veiculo.api.VeiculoApi.TipoVeiculo.TipoVeiculo;
 import com.veiculo.api.VeiculoApi.repository.RepositorioVeiculo;
+import com.veiculo.api.VeiculoApi.repository.RepositoryMarca;
 
+import org.hibernate.internal.util.collections.ConcurrentReferenceHashMap.Option;
 import org.springframework.boot.Banner;
 
 
@@ -24,11 +26,14 @@ public class Principal {
     public  converteDadosMapper conversao = new converteDadosMapper();
     public List<TipoVeiculo> veiculosGuardados = new ArrayList<>();
     public List<TipoVeiculo> veiculosGuardadosNoBanco = new ArrayList<>();
+    public List<Marca> marcaSalvaNoBanco = new ArrayList<>();
+    private RepositoryMarca repositoryMarca;
 
     private RepositorioVeiculo  repositorioVeiculo;
-    public Principal(RepositorioVeiculo repositorioVeiculo) {
+    public Principal(RepositorioVeiculo repositorioVeiculo, RepositoryMarca repositoryMarca) {
         this.modelos = new Modelo(new ArrayList<>());
         this.repositorioVeiculo = repositorioVeiculo;
+        this.repositoryMarca = repositoryMarca;
         
         
     }
@@ -37,7 +42,7 @@ public class Principal {
     public void exibeMenu() throws IOException, InterruptedException {
         boolean tentativa = true;
         String opcao;
-        //Marca marca;
+        
 
 
         ConversaoDado dado = new ConversaoDado();
@@ -45,10 +50,11 @@ public class Principal {
         while(tentativa){
             System.out.println("Digite uma opçao para olhar");
             System.out.println("-> Carros");
-            //System.out.println("Moto");
+            
             System.out.println("-> Caminhoes");
             System.out.println("-> Mostrar veiculos armazenados");
             System.out.println("-> Procurar veículos armazaneados por meio da marca (Digite 4)");
+            System.out.println("-> Procurar veículos armazenados por meio do modelo (Digite 5)");
             System.out.println("-> Sair");
             opcao = scanner.nextLine();
 
@@ -65,12 +71,14 @@ public class Principal {
                 Optional<Marca> marcaEncontrada = marcaCaminhao.stream()
                         .filter(caminhao -> caminhao.getNome().equalsIgnoreCase(nomeMarca)).findFirst();
 
-
+                
                 if (marcaEncontrada.isPresent()) {
-                    
+                    // salvar no banco
+                    armazenarMarcaESeusDadosNoBanco(marcaEncontrada.get());
 
                     obj = dado.obterDadosMarca(opcao.toLowerCase(), marcaEncontrada.get().getCodigo());
                     Modelo modelos = conversao.converteDeJsonParaClasse(obj, Modelo.class);
+                
                     System.out.println(modelos);
                     System.out.println("Digite o nome da modelo do caminhao");
                     var nomeModelo = scanner.nextLine();
@@ -125,7 +133,8 @@ public class Principal {
                 String codigo = scanner.nextLine();
                 obj = dado.obterDadosMarca(opcao.toLowerCase(), codigo);
                 // salvar o nome da marca no banco
-              
+                Marca marca = conversao.converteDeJsonParaClasse(obj, Marca.class); // converte para objeto
+                armazenarMarcaESeusDadosNoBanco(marca);
                 
                 Modelo modelos = conversao.converteDeJsonParaClasse(obj, Modelo.class);
                 System.out.println(modelos);
@@ -186,6 +195,11 @@ public class Principal {
             else if (opcao.toLowerCase().equals("sair")){
                 tentativa = false;
             }
+
+            else if (opcao.equals("4")){
+                procurarVeiculoPorMarca();
+            }
+
             else {
                 System.out.println("Opção inválida");
             }
@@ -221,6 +235,39 @@ public class Principal {
     public void salvarVeiculoNoBanco(TipoVeiculo veiculo){
 
         repositorioVeiculo.save(veiculo);
+    }
+
+    public void procurarVeiculoPorMarca(){
+        System.out.println("Procurando veiculo por marca");
+        System.out.println("Digite a marca do veiculo: ");
+        String marcaBuscada = scanner.nextLine();
+
+        // e se tiver vários veiculos com a mesma marca?
+
+        List<TipoVeiculo> veiculos = veiculosGuardadosNoBanco.stream()
+            .filter(v -> v.getMarca().equalsIgnoreCase(marcaBuscada))
+            .toList();
+
+        if (veiculos.isEmpty()){
+            System.out.println("Nenhum veiculo encontrado");
+        }
+        else {
+            veiculos.forEach(System.out::println);
+        }
+
+        
+    }
+
+    public void armazenarMarcaESeusDadosNoBanco(Marca marca){
+        repositoryMarca.save(marca);
+
+    }
+
+    public void mostrarMarcasSalvasNoBanco(){
+        marcaSalvaNoBanco = repositoryMarca.findAll();
+        marcaSalvaNoBanco.stream()
+            .sorted((m1, m2) -> m1.getNome().compareTo(m2.getNome()))
+            .forEach(System.out::println);
     }
 
 }
