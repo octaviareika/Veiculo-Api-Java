@@ -54,7 +54,8 @@ public class Principal {
             System.out.println("-> Caminhoes");
             System.out.println("-> Mostrar veiculos armazenados");
             System.out.println("-> Procurar veículos armazaneados por meio da marca (Digite 4)");
-            System.out.println("-> Procurar veículos armazenados por meio do modelo (Digite 5)");
+            // System.out.println("-> Procurar veículos armazenados por meio do modelo (Digite 5)");
+            System.out.println("-> Procurar veículos armazenados por meio de um intervalon de ano (Digite 5)");
             System.out.println("-> Sair");
             opcao = scanner.nextLine();
 
@@ -200,12 +201,28 @@ public class Principal {
                 procurarVeiculoPorMarca();
             }
 
+            else if (opcao.equals("5")){
+                System.out.println("Digite o nome do modelo");
+                String nome = scanner.nextLine();
+                mostrarDados(nome);
+            }
+
+            else if (opcao.equals("6")){
+                System.out.println("Digite o ano inicial");
+                int anoInicial = scanner.nextInt();
+                System.out.println("Digite o ano final");
+                int anoFinal = scanner.nextInt();
+                mostrarVeiculosPorIntervaloDeAno(anoInicial, anoFinal);
+            }
+
             else {
                 System.out.println("Opção inválida");
             }
 
         }
     }
+
+
 
     public void mostrarDados(String nome) throws IOException, InterruptedException {;
         Optional<ModeloCarro> modelo = modelos.modelos().stream()
@@ -268,6 +285,19 @@ public class Principal {
         marcaSalvaNoBanco.stream()
             .sorted((m1, m2) -> m1.getNome().compareTo(m2.getNome()))
             .forEach(System.out::println);
+    }
+
+    private void mostrarVeiculosPorIntervaloDeAno(int anoInicial, int anoFinal) {
+        List<TipoVeiculo> veiculos = veiculosGuardadosNoBanco.stream()
+            .filter(v -> v.getAnoModelo() >= anoInicial && v.getAnoModelo() <= anoFinal)
+            .toList();
+
+        if (veiculos.isEmpty()){
+            System.out.println("Nenhum veiculo encontrado");
+        }
+        else {
+            veiculos.forEach(System.out::println);
+        }
     }
 
 }
