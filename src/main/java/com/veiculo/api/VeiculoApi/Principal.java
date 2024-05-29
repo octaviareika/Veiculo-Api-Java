@@ -52,10 +52,10 @@ public class Principal {
             System.out.println("-> Carros");
             
             System.out.println("-> Caminhoes");
-            System.out.println("-> Mostrar veiculos armazenados");
+            System.out.println("-> Mostrar veiculos armazenados (Digite 3)");
             System.out.println("-> Procurar veículos armazaneados por meio da marca (Digite 4)");
-            // System.out.println("-> Procurar veículos armazenados por meio do modelo (Digite 5)");
-            System.out.println("-> Procurar veículos armazenados por meio de um intervalon de ano (Digite 5)");
+            System.out.println("-> Procurar veículos armazenados por meio de um intervalo de ano (Digite 5)");
+            System.out.println("-> Procurar veículo por modelo (Digite 6)");
             System.out.println("-> Sair");
             opcao = scanner.nextLine();
 
@@ -189,7 +189,7 @@ public class Principal {
 
             }
 
-            else if (opcao.toLowerCase().equals("mostrar veiculos armazenados")){
+            else if (opcao.toLowerCase().equals("3")){
                 mostrarVeiculosSalvosNoBanco();
             }
 
@@ -202,18 +202,20 @@ public class Principal {
             }
 
             else if (opcao.equals("5")){
-                System.out.println("Digite o nome do modelo");
-                String nome = scanner.nextLine();
-                mostrarDados(nome);
-            }
-
-            else if (opcao.equals("6")){
+               //mostrar veiculos armazenados num intervalo de ano
                 System.out.println("Digite o ano inicial");
                 int anoInicial = scanner.nextInt();
                 System.out.println("Digite o ano final");
                 int anoFinal = scanner.nextInt();
                 mostrarVeiculosPorIntervaloDeAno(anoInicial, anoFinal);
             }
+
+            else if (opcao.equals("6")){
+             
+                procurarVeiculoPorModelo();
+
+            }
+
 
             else {
                 System.out.println("Opção inválida");
@@ -258,9 +260,9 @@ public class Principal {
         System.out.println("Procurando veiculo por marca");
         System.out.println("Digite a marca do veiculo: ");
         String marcaBuscada = scanner.nextLine();
-
+        veiculosGuardadosNoBanco = repositorioVeiculo.findAll();
         // e se tiver vários veiculos com a mesma marca?
-
+        
         List<TipoVeiculo> veiculos = veiculosGuardadosNoBanco.stream()
             .filter(v -> v.getMarca().equalsIgnoreCase(marcaBuscada))
             .toList();
@@ -288,8 +290,24 @@ public class Principal {
     }
 
     private void mostrarVeiculosPorIntervaloDeAno(int anoInicial, int anoFinal) {
+        veiculosGuardadosNoBanco = repositorioVeiculo.findAll();
+       //    public List<TipoVeiculo> findByAnoModeloBetween(int anoModelo1, int anoModelo2);
+        List<TipoVeiculo> veiculoIntervaloDeTempo = repositorioVeiculo.findByAnoModeloBetween(anoInicial, anoFinal);
+
+        if (veiculoIntervaloDeTempo.isEmpty()){
+            System.out.println("Nenhum veiculo encontrado");
+        }
+        else {
+            veiculoIntervaloDeTempo.forEach(System.out::println);
+        }
+    }
+
+    public void procurarVeiculoPorModelo(){
+        System.out.println("Digite o modelo do veiculo");
+        String modelo = scanner.nextLine();
+        veiculosGuardadosNoBanco = repositorioVeiculo.findAll();
         List<TipoVeiculo> veiculos = veiculosGuardadosNoBanco.stream()
-            .filter(v -> v.getAnoModelo() >= anoInicial && v.getAnoModelo() <= anoFinal)
+            .filter(v -> v.getModelo().equalsIgnoreCase(modelo))
             .toList();
 
         if (veiculos.isEmpty()){
@@ -298,6 +316,7 @@ public class Principal {
         else {
             veiculos.forEach(System.out::println);
         }
+
     }
 
 }

@@ -4,6 +4,7 @@ package com.veiculo.api.VeiculoApi;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,17 +34,17 @@ public class Marca {
     private String codigo;
 
     // Uma marca de veículos tem vários modelos
-    @OneToMany(mappedBy = "marca") // mapeamento bidirecional, seria tipo um join
-    private List<ModeloCarro> modelos;
+    @OneToMany(mappedBy = "marca", cascade = CascadeType.ALL) // mapeamento bidirecional, seria tipo um join
+    private List<ModeloCarro> modelos = new ArrayList<>();
 
     public Marca() {
-        modelos = new ArrayList<>();
+        
     }
 
     public Marca(String nome, String codigo) {
         this.nome = nome;
         this.codigo = codigo;
-        modelos = new ArrayList<>();
+
     }
 
     public String getNome() {

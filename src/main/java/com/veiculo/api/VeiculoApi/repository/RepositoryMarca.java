@@ -6,5 +6,8 @@ import com.veiculo.api.VeiculoApi.Marca;
 
 public interface RepositoryMarca extends JpaRepository<Marca, Long>{
 
+
+    
+
     
 } 
