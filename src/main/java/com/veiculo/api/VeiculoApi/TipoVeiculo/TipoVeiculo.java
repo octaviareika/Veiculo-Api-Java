@@ -54,7 +54,7 @@ public class TipoVeiculo {
     }
 
     public TipoVeiculo(int idTipoVeiculo, String combustivel, String codigoFipe, String mesReferencia, String siglaComb,
-                       int anoModelo, String valor, ModeloCarro modelo, Marca marca, AnoCarro ano) {
+                       int anoModelo, String valor, ModeloCarro modelo, Marca marca) {
         this.idTipoVeiculo = idTipoVeiculo;
         this.valor = valor;
         this.marca = marca.getNome();
@@ -64,6 +64,7 @@ public class TipoVeiculo {
         this.codigoFipe = codigoFipe;
         this.mesReferencia = mesReferencia;
         this.siglaComb = siglaComb;
+        
     }
 
     public Long getId() {
@@ -152,4 +153,6 @@ public class TipoVeiculo {
                 + "Ano de Modelo: " + anoModelo + "\n" + "CodigoFipe: " + codigoFipe + "\n" + "MesReferencia: " + mesReferencia +
                 "\n" + "SiglaComb: " + siglaComb;
     }
+
+    
 }

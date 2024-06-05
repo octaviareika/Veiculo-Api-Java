@@ -18,6 +18,7 @@ import com.veiculo.api.VeiculoApi.repository.RepositoryMarca;
 
 import org.hibernate.internal.util.collections.ConcurrentReferenceHashMap.Option;
 import org.springframework.boot.Banner;
+import org.springframework.data.domain.PageRequest;
 
 
 public class Principal {
@@ -55,7 +56,7 @@ public class Principal {
             System.out.println("-> Mostrar veiculos armazenados (Digite 3)");
             System.out.println("-> Procurar veículos armazaneados por meio da marca (Digite 4)");
             System.out.println("-> Procurar veículos armazenados por meio de um intervalo de ano (Digite 5)");
-            System.out.println("-> Procurar veículo por modelo (Digite 6)");
+            System.out.println("-> Mostrar os três veículos mais baratos (Digite 6)");
             System.out.println("-> Sair");
             opcao = scanner.nextLine();
 
@@ -97,7 +98,7 @@ public class Principal {
                        var anoModelo = scanner.nextLine();
 
                        Optional<AnoCarro> anoEncontrado = anos.stream()
-                               .filter(a -> a.getNome().equalsIgnoreCase(anoModelo)).findFirst();
+                               .filter(a -> a.getNome().toLowerCase().equalsIgnoreCase(anoModelo.toLowerCase())).findFirst();
                        if (anoEncontrado.isPresent()) {
                            obj = dado.obterDadosFinal(opcao.toLowerCase(), marcaEncontrada.get().getCodigo(),
                                    anoEncontrado.get().getCodigo(), modeloEncontrado.get().getCodigo());
@@ -210,10 +211,9 @@ public class Principal {
                 mostrarVeiculosPorIntervaloDeAno(anoInicial, anoFinal);
             }
 
-            else if (opcao.equals("6")){
-             
-                procurarVeiculoPorModelo();
 
+            else if (opcao.equals("6")){
+                mostrarOs3VeiculosMaisBaratos();
             }
 
 
@@ -302,21 +302,18 @@ public class Principal {
         }
     }
 
-    public void procurarVeiculoPorModelo(){
-        System.out.println("Digite o modelo do veiculo");
-        String modelo = scanner.nextLine();
-        veiculosGuardadosNoBanco = repositorioVeiculo.findAll();
-        List<TipoVeiculo> veiculos = veiculosGuardadosNoBanco.stream()
-            .filter(v -> v.getModelo().equalsIgnoreCase(modelo))
-            .toList();
 
-        if (veiculos.isEmpty()){
+
+    public void mostrarOs3VeiculosMaisBaratos(){
+        veiculosGuardadosNoBanco = repositorioVeiculo.findAll();
+        // @Query("SELECT v from TipoVeiculo v ORDER BY v.preco ASC")
+        List<TipoVeiculo> veiculosMaisBaratos = repositorioVeiculo.procurarVeiculoMaisBarato(PageRequest.of(0, 3));
+        if (veiculosMaisBaratos.isEmpty()){
             System.out.println("Nenhum veiculo encontrado");
         }
         else {
-            veiculos.forEach(System.out::println);
+            veiculosMaisBaratos.forEach(System.out::println);
         }
-
     }
 
 }
